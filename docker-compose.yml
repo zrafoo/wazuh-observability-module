@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  models:
+    build: .
+    container_name: "models"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: models_db
+      POSTGRES_USER: models_user
+      POSTGRES_PASSWORD: models_password
+      POSTGRES_SOURCE_TABLE: opensearch_events
+      POSTGRES_CLEAN_TABLE: opensearch_events_clean
+      POSTGRES_EVENT_SOURCE_TABLE: opensearch_events_clean
+      POSTGRES_EVENT_TABLE: event_links
+      TRUNCATE_OPENSEARCH_EVENTS: "true"
+      TRUNCATE_CLEAN_TABLE: "true"
+      TRUNCATE_EVENT_TABLE: "true"
+      MIN_TRANSITION_THETA: "0.3"
+      LINK_TIME_SCALE_SECONDS: "300"
+      LINK_DT_MAX_SECONDS: "300"
+      LINK_OBJECT_SIM_EPS: "0.6"
+      LINK_WEIGHT_TIME: "0.1"
+      LINK_WEIGHT_SUBJECT: "0.3"
+      LINK_WEIGHT_OBJECT: "0.2"
+      LINK_WEIGHT_SEMANTIC: "0.4"
+      USAGE_PERCENT_TO_DROP: "10"
+      DEFAULT_TOP_K: "2"
+      DEFAULT_TARGET_SEVERITY: "15"
+      DEFAULT_TARGET_LIMIT: "100"
+      OPENSEARCH_HOST: "192.168.100.101"
+      OPENSEARCH_PORT: "9200"
+      OPENSEARCH_HTTPS: "true"
+      OPENSEARCH_USER: "admin"
+      OPENSEARCH_PASSWORD: "SecretPassword"
+      EXPORT_DAYS_FROM_OPENSEARCH: "365"
+      GRAPHICS_HOST: "0.0.0.0"
+      GRAPHICS_PORT: "3000"
+      SHOW_DECISION_METRICS: "true"
+
+  db:
+    image: postgres:15.5
+    container_name: "models-pgdb"
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: models_db
+      POSTGRES_USER: models_user
+      POSTGRES_PASSWORD: models_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
